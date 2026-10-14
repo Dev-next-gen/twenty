@@ -1,17 +1,49 @@
-import { replaceCampaignVariables } from 'src/modules/emailing/utils/replace-campaign-variables.util';
+import {
+  type EmailDocumentStringContext,
+  isDefined,
+  parseTemplateVariableWithFallback,
+} from 'twenty-shared/utils';
+import { CAPTURE_ALL_VARIABLE_TAG_INNER_REGEX } from 'twenty-shared/workflow';
+
+import { escapeHtml } from 'src/engine/core-modules/emailing-domain/utils/escape-html.util';
 import { resolveCampaignVariableValue } from 'src/modules/emailing/utils/resolve-campaign-variable-value.util';
+
+const encodeValueForContext = (
+  value: string,
+  context: EmailDocumentStringContext,
+): string => {
+  switch (context) {
+    case 'html':
+    case 'rawHtml':
+      return escapeHtml(value);
+    case 'text':
+      return value;
+    case 'url':
+      return encodeURIComponent(value);
+  }
+};
 
 export const renderCampaignTemplate = ({
   template,
   values,
-  encodeValue,
+  context,
 }: {
   template: string;
   values: Record<string, string>;
-  encodeValue: (value: string) => string;
+  context: EmailDocumentStringContext;
 }): string =>
-  replaceCampaignVariables({
-    template,
-    replaceCampaignVariable: (campaignVariable) =>
-      encodeValue(resolveCampaignVariableValue({ campaignVariable, values })),
-  });
+  template.replace(
+    CAPTURE_ALL_VARIABLE_TAG_INNER_REGEX,
+    (rawTemplateVariable) => {
+      const campaignVariable =
+        parseTemplateVariableWithFallback(rawTemplateVariable);
+
+      if (!isDefined(campaignVariable)) {
+        return rawTemplateVariable;
+      }
+
+      const value = resolveCampaignVariableValue({ campaignVariable, values });
+
+      return encodeValueForContext(value, context);
+    },
+  );

@@ -4,8 +4,10 @@ import {
   isDefined,
   parseCanonicalEmailDocument,
   parseJson,
+  parseTemplateVariableWithFallback,
   type TemplateVariableWithFallback,
 } from 'twenty-shared/utils';
+import { CAPTURE_ALL_VARIABLE_TAG_INNER_REGEX } from 'twenty-shared/workflow';
 
 import { compileOutboundEmailContent } from 'src/engine/core-modules/email/utils/compile-outbound-email-content.util';
 import { resolveEmailDocumentBindings } from 'src/engine/core-modules/email/utils/resolve-email-document-bindings.util';
@@ -14,7 +16,6 @@ import {
   EmailingDomainExceptionCode,
 } from 'src/engine/core-modules/emailing-domain/exceptions/emailing-domain.exception';
 import { type EmailingDomainEmailTemplate } from 'src/engine/core-modules/emailing-domain/drivers/types/emailing-domain-email-template.type';
-import { replaceCampaignVariables } from 'src/modules/emailing/utils/replace-campaign-variables.util';
 
 const CAMPAIGN_BATCH_TAG_PREFIXES = {
   htmlEscaped: 'v_h',
@@ -73,11 +74,19 @@ export const compileCampaignBatchTemplate = async ({
   };
 
   const toTags = (value: string, tagFamily: CampaignBatchTagFamily): string =>
-    replaceCampaignVariables({
-      template: value,
-      replaceCampaignVariable: (campaignVariable) =>
-        `{{${CAMPAIGN_BATCH_TAG_PREFIXES[tagFamily]}_${indexOfCampaignVariable(campaignVariable)}}}`,
-    });
+    value.replace(
+      CAPTURE_ALL_VARIABLE_TAG_INNER_REGEX,
+      (rawTemplateVariable) => {
+        const campaignVariable =
+          parseTemplateVariableWithFallback(rawTemplateVariable);
+
+        if (!isDefined(campaignVariable)) {
+          return rawTemplateVariable;
+        }
+
+        return `{{${CAMPAIGN_BATCH_TAG_PREFIXES[tagFamily]}_${indexOfCampaignVariable(campaignVariable)}}}`;
+      },
+    );
 
   const subject = toTags(subjectTemplate, 'raw');
 

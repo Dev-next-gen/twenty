@@ -1,7 +1,4 @@
-import { escapeHtml } from 'src/engine/core-modules/emailing-domain/utils/escape-html.util';
 import { renderCampaignTemplate } from 'src/modules/emailing/utils/render-campaign-template.util';
-
-const keepValue = (value: string) => value;
 
 describe('renderCampaignTemplate', () => {
   it('renders a plain variable exactly as before, blank when the value is empty', () => {
@@ -9,7 +6,7 @@ describe('renderCampaignTemplate', () => {
       renderCampaignTemplate({
         template: 'Hi {{jobTitle}} for {{ city }}',
         values: { jobTitle: 'CTO', city: '' },
-        encodeValue: keepValue,
+        context: 'text',
       }),
     ).toBe('Hi CTO for ');
   });
@@ -19,7 +16,7 @@ describe('renderCampaignTemplate', () => {
       renderCampaignTemplate({
         template: 'Hi {{jobTitle | default: "there"}}',
         values: { jobTitle: ' \t ' },
-        encodeValue: keepValue,
+        context: 'text',
       }),
     ).toBe('Hi there');
   });
@@ -29,7 +26,7 @@ describe('renderCampaignTemplate', () => {
       renderCampaignTemplate({
         template: 'Hi {{ jobTitle|default:"there" }}',
         values: { jobTitle: ' CTO ' },
-        encodeValue: keepValue,
+        context: 'text',
       }),
     ).toBe('Hi  CTO ');
   });
@@ -40,7 +37,7 @@ describe('renderCampaignTemplate', () => {
         template:
           '<p>{{jobTitle | default: "<script>alert(\'x\')</script> & co"}}</p>',
         values: {},
-        encodeValue: escapeHtml,
+        context: 'html',
       }),
     ).toBe('<p>&lt;script&gt;alert(&#39;x&#39;)&lt;/script&gt; &amp; co</p>');
   });

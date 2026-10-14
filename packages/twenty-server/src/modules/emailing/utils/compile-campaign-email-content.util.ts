@@ -12,7 +12,6 @@ import {
   EmailingDomainException,
   EmailingDomainExceptionCode,
 } from 'src/engine/core-modules/emailing-domain/exceptions/emailing-domain.exception';
-import { escapeHtml } from 'src/engine/core-modules/emailing-domain/utils/escape-html.util';
 import { renderCampaignTemplate } from 'src/modules/emailing/utils/render-campaign-template.util';
 
 export const compileCampaignEmailContent = async ({
@@ -41,16 +40,7 @@ export const compileCampaignEmailContent = async ({
   return compileOutboundEmailContent(
     isDefined(values)
       ? resolveEmailDocumentBindings(parseResult.document, (value, context) =>
-          renderCampaignTemplate({
-            template: value,
-            values,
-            encodeValue: {
-              html: escapeHtml,
-              rawHtml: escapeHtml,
-              text: (variableValue: string) => variableValue,
-              url: encodeURIComponent,
-            }[context],
-          }),
+          renderCampaignTemplate({ template: value, values, context }),
         )
       : parseResult.document,
   );

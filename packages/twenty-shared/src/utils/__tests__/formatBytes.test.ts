@@ -7,6 +7,7 @@ describe('formatBytes', () => {
     [1023, '1023 B'],
     [1024, '1 KB'],
     [1536, '1.5 KB'],
+    [1_048_524, '1023.9 KB'],
     [1024 ** 2, '1 MB'],
     [1024 ** 3, '1 GB'],
     [107_374_182_400, '100 GB'],
@@ -14,6 +15,17 @@ describe('formatBytes', () => {
   ])('formats %i as %s', (bytes, expected) => {
     expect(formatBytes(bytes)).toBe(expected);
   });
+
+  it.each([
+    [1024 ** 2 - 1, '1 MB'],
+    [1024 ** 3 - 1, '1 GB'],
+    [1024 ** 4 - 1, '1 TB'],
+  ])(
+    'moves %i to the next unit when rounding reaches 1024',
+    (bytes, expected) => {
+      expect(formatBytes(bytes)).toBe(expected);
+    },
+  );
 
   it('stays on terabytes past the largest unit', () => {
     expect(formatBytes(1024 ** 5)).toBe('1024 TB');

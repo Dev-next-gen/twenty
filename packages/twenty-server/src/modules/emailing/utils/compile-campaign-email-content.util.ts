@@ -14,13 +14,10 @@ import {
 } from 'src/engine/core-modules/emailing-domain/exceptions/emailing-domain.exception';
 import { renderCampaignTemplate } from 'src/modules/emailing/utils/render-campaign-template.util';
 
-export const compileCampaignEmailContent = async ({
-  bodyTemplate,
-  values,
-}: {
-  bodyTemplate: string;
-  values: Record<string, string> | null;
-}): Promise<CompiledOutboundEmailContent> => {
+export const compileCampaignEmailContent = async (
+  bodyTemplate: string,
+  variables: Record<string, string> | null,
+): Promise<CompiledOutboundEmailContent> => {
   if (bodyTemplate.trim() === '') {
     return { html: '', plainText: '' };
   }
@@ -38,9 +35,9 @@ export const compileCampaignEmailContent = async ({
   }
 
   return compileOutboundEmailContent(
-    isDefined(values)
+    isDefined(variables)
       ? resolveEmailDocumentBindings(parseResult.document, (value, context) =>
-          renderCampaignTemplate({ template: value, values, context }),
+          renderCampaignTemplate(value, variables, context),
         )
       : parseResult.document,
   );

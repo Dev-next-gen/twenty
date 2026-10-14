@@ -23,15 +23,11 @@ const encodeValueForContext = (
   }
 };
 
-export const renderCampaignTemplate = ({
-  template,
-  values,
-  context,
-}: {
-  template: string;
-  values: Record<string, string>;
-  context: EmailDocumentStringContext;
-}): string =>
+export const renderCampaignTemplate = (
+  template: string,
+  variables: Record<string, string>,
+  context: EmailDocumentStringContext,
+): string =>
   template.replace(
     CAPTURE_ALL_VARIABLE_TAG_INNER_REGEX,
     (rawTemplateVariable) => {
@@ -42,7 +38,10 @@ export const renderCampaignTemplate = ({
         return rawTemplateVariable;
       }
 
-      const value = resolveCampaignVariableValue({ campaignVariable, values });
+      const value = resolveCampaignVariableValue({
+        campaignVariable,
+        variables,
+      });
 
       return encodeValueForContext(value, context);
     },

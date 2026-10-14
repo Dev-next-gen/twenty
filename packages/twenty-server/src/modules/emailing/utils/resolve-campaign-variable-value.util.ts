@@ -6,13 +6,13 @@ import {
 
 export const resolveCampaignVariableValue = ({
   campaignVariable: { name, fallback },
-  values,
+  variables,
 }: {
   campaignVariable: TemplateVariableWithFallback;
-  values: Record<string, string>;
+  variables: Record<string, string>;
 }): string => {
-  const value = Object.prototype.hasOwnProperty.call(values, name)
-    ? (values[name] ?? '')
+  const value = Object.prototype.hasOwnProperty.call(variables, name)
+    ? (variables[name] ?? '')
     : '';
 
   return isDefined(fallback) && !isNonEmptyString(value.trim())

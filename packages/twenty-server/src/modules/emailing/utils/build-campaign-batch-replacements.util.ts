@@ -5,15 +5,15 @@ import { resolveCampaignVariableValue } from 'src/modules/emailing/utils/resolve
 
 export const buildCampaignBatchReplacements = ({
   campaignVariables,
-  values,
+  variables,
 }: {
   campaignVariables: TemplateVariableWithFallback[];
-  values: Record<string, string>;
+  variables: Record<string, string>;
 }): Record<string, string> => {
   const replacements: Record<string, string> = {};
 
   for (const [index, campaignVariable] of campaignVariables.entries()) {
-    const value = resolveCampaignVariableValue({ campaignVariable, values });
+    const value = resolveCampaignVariableValue({ campaignVariable, variables });
 
     replacements[`v_h_${index}`] = escapeHtml(value);
     replacements[`v_t_${index}`] = value;

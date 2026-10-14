@@ -19,7 +19,7 @@ export const renderCampaignEmail = async ({
     subject: renderCampaignTemplate({
       template: subjectTemplate,
       values,
-      encodeValue: (value) => value,
+      context: 'text',
     }),
     html,
     plainText,

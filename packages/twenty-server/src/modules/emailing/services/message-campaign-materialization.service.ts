@@ -222,10 +222,8 @@ export class MessageCampaignMaterializationService {
 
       if (shouldCreateMessages) {
         const { plainText: unrenderedText } = await compileCampaignEmailContent(
-          {
-            bodyTemplate: campaign.bodyTemplate ?? '',
-            values: null,
-          },
+          campaign.bodyTemplate ?? '',
+          null,
         );
 
         await this.insertCampaignMessages({

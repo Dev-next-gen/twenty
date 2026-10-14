@@ -57,7 +57,7 @@ export const compileCampaignBatchTemplate = async ({
 }> => {
   const campaignVariables: TemplateVariableWithFallback[] = [];
 
-  const indexOfCampaignVariable = (
+  const indexOfVariable = (
     campaignVariable: TemplateVariableWithFallback,
   ): number => {
     const existingIndex = campaignVariables.findIndex(
@@ -84,7 +84,7 @@ export const compileCampaignBatchTemplate = async ({
           return rawTemplateVariable;
         }
 
-        return `{{${CAMPAIGN_BATCH_TAG_PREFIXES[tagFamily]}_${indexOfCampaignVariable(campaignVariable)}}}`;
+        return `{{${CAMPAIGN_BATCH_TAG_PREFIXES[tagFamily]}_${indexOfVariable(campaignVariable)}}}`;
       },
     );
 

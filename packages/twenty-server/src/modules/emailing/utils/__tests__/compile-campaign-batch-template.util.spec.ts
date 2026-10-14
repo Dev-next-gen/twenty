@@ -17,11 +17,11 @@ const paragraphDocument = (text: string): string =>
 const deliverToRecipient = async ({
   subjectTemplate = 'Newsletter',
   bodyTemplate,
-  values,
+  variables,
 }: {
   subjectTemplate?: string;
   bodyTemplate: string;
-  values: Record<string, string>;
+  variables: Record<string, string>;
 }) => {
   const { template, campaignVariables } = await compileCampaignBatchTemplate({
     subjectTemplate,
@@ -29,7 +29,7 @@ const deliverToRecipient = async ({
   });
   const replacements = buildCampaignBatchReplacements({
     campaignVariables,
-    values,
+    variables,
   });
 
   return {
@@ -48,7 +48,7 @@ describe('compileCampaignBatchTemplate', () => {
   it('escapes a body variable in the html email while leaving it raw in the plain text email', async () => {
     const { html, text } = await deliverToRecipient({
       bodyTemplate: paragraphDocument('Hi {{firstName}}, welcome.'),
-      values: { firstName: '<img src=x onerror=alert(1)>' },
+      variables: { firstName: '<img src=x onerror=alert(1)>' },
     });
 
     expect(html).toContain('Hi &lt;img src=x onerror=alert(1)&gt;, welcome.');
@@ -75,7 +75,7 @@ describe('compileCampaignBatchTemplate', () => {
           ],
         },
       ]),
-      values: { token: '" onmouseover="alert(1)' },
+      variables: { token: '" onmouseover="alert(1)' },
     });
 
     expect(html).toContain(
@@ -93,7 +93,7 @@ describe('compileCampaignBatchTemplate', () => {
           content: [{ type: 'text', text: 'Open' }],
         },
       ]),
-      values: { website: 'javascript:alert(1)' },
+      variables: { website: 'javascript:alert(1)' },
     });
 
     expect(html).toContain('Open');
@@ -105,7 +105,7 @@ describe('compileCampaignBatchTemplate', () => {
       bodyTemplate: paragraphDocument(
         '{{firstName}} {{lastName}}, this is for {{firstName}}.',
       ),
-      values: { firstName: 'Ada', lastName: 'Lovelace' },
+      variables: { firstName: 'Ada', lastName: 'Lovelace' },
     });
 
     expect(campaignVariables).toEqual([
@@ -121,7 +121,7 @@ describe('compileCampaignBatchTemplate', () => {
       const { subject, html, text } = await deliverToRecipient({
         subjectTemplate: 'Hi {{firstName}}, a word',
         bodyTemplate,
-        values: { firstName: '<b>Ada</b>' },
+        variables: { firstName: '<b>Ada</b>' },
       });
 
       expect(subject).toBe('Hi <b>Ada</b>, a word');
@@ -145,7 +145,7 @@ describe('compileCampaignBatchTemplate', () => {
           ],
         },
       ]),
-      values: { jobTitle: ' ' },
+      variables: { jobTitle: ' ' },
     });
 
     expect(subject).toBe('Hi there');
@@ -158,7 +158,7 @@ describe('compileCampaignBatchTemplate', () => {
       bodyTemplate: paragraphDocument(
         '[{{jobTitle}}] [{{ jobTitle | default: "there" }}] [{{jobTitle|default:"there"}}]',
       ),
-      values: {},
+      variables: {},
     });
 
     expect(html).toContain('[] [there] [there]');
@@ -185,7 +185,7 @@ describe('compileCampaignBatchTemplate', () => {
           ],
         },
       ]),
-      values: { city: '' },
+      variables: { city: '' },
     });
 
     expect(html).toContain(

@@ -263,14 +263,15 @@ export class MessageCampaignService {
       }),
     );
 
-    const values = await this.campaignVariableService.buildVariablesForPerson(
-      workspaceId,
-      null,
-    );
+    const variables =
+      await this.campaignVariableService.buildVariablesForPerson(
+        workspaceId,
+        null,
+      );
     const rendered = await renderCampaignEmail({
       subjectTemplate: subject,
       bodyTemplate: html,
-      values,
+      variables,
     });
 
     await this.throttlerService.tokenBucketThrottleOrThrow(

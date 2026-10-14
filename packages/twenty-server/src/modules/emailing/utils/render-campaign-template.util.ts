@@ -8,11 +8,11 @@ import { CAPTURE_ALL_VARIABLE_TAG_INNER_REGEX } from 'twenty-shared/workflow';
 import { escapeHtml } from 'src/engine/core-modules/emailing-domain/utils/escape-html.util';
 import { resolveCampaignVariableValue } from 'src/modules/emailing/utils/resolve-campaign-variable-value.util';
 
-const encodeValueForContext = (
+const encodeValueForContentType = (
   value: string,
-  context: EmailDocumentStringContext,
+  contentType: EmailDocumentStringContext,
 ): string => {
-  switch (context) {
+  switch (contentType) {
     case 'html':
     case 'rawHtml':
       return escapeHtml(value);
@@ -26,7 +26,7 @@ const encodeValueForContext = (
 export const renderCampaignTemplate = (
   template: string,
   variables: Record<string, string>,
-  context: EmailDocumentStringContext,
+  contentType: EmailDocumentStringContext,
 ): string =>
   template.replace(
     CAPTURE_ALL_VARIABLE_TAG_INNER_REGEX,
@@ -43,6 +43,6 @@ export const renderCampaignTemplate = (
         variables,
       });
 
-      return encodeValueForContext(value, context);
+      return encodeValueForContentType(value, contentType);
     },
   );
